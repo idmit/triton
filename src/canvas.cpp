@@ -13,6 +13,9 @@ Canvas::Canvas(QWidget *parent) : QWidget(parent) {
 void Canvas::drawLetters(QPainter &painter) {
   int w = fontSizeInPixels, h = fontSizeInPixels;
   cursorHorPos = 0, cursorVertPos = 0;
+
+  painter.fillRect(QRectF(0, 0, width(), height()), QBrush(QColor("white")));
+
   for (int t = 0; t < text.size(); ++t) {
     if (text.at(t) == '\n') {
       ++cursorVertPos;
