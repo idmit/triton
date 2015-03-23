@@ -2,6 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QString>
+
+#include "canvas.h"
+#include "iocontroller.h"
 
 namespace Ui {
   class MainWindow;
@@ -17,6 +21,17 @@ public:
 
 private:
   Ui::MainWindow *ui;
+
+  Canvas *canvas;
+  IOController ioController;
+  QString projectFileName;
+
+  void initMenuBar();
+
+public slots:
+  void openFont(QString fontPath = "");
+  void redoCmd() ;
+  void undoCmd();
 };
 
 #endif // MAINWINDOW_H

@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = triton
+TARGET = Triton
 TEMPLATE = app
 QMAKE_CXXFLAGS += -std=c++11
 
@@ -17,8 +17,17 @@ macx {
 }
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    canvas.cpp \
+    iocontroller.cpp \
+    spline.cpp \
+    splinegroup.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    canvas.h \
+    iocontroller.h \
+    spline.h \
+    splinegroup.h \
+    canvas_actions.h
 
 FORMS    += mainwindow.ui
