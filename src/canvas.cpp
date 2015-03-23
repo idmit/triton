@@ -27,7 +27,6 @@ void Canvas::drawLetters(QPainter &painter) {
     }
     SplineGroup d = map.value(text.at(t));
     SplineGroup *activeGroup = &d;
-    activeGroup->rebuildAll();
 
     QVector<QPainterPath> paths;
 
@@ -93,6 +92,9 @@ QString Canvas::changeFont(IOController &ioController, QString fontPath) {
   }
   if (!fontPath.isEmpty()) {
     map = ioController.readFromFile(fontPath);
+    foreach (QString key, map.keys()) {
+      map.find(key)->rebuildAll();
+    }
     repaint();
   }
   QFileInfo fileInfo(fontPath);
