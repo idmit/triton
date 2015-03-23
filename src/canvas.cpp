@@ -25,6 +25,13 @@ void Canvas::drawLetters(QPainter &painter) {
     if (text.at(t) == '\r') {
       continue;
     }
+    if (text.at(t) == ' ') {
+      ++cursorHorPos;
+      continue;
+    }
+    if (!map.contains(text.at(t))) {
+      continue;
+    }
     SplineGroup d = map.value(text.at(t));
     SplineGroup *activeGroup = &d;
 
@@ -79,10 +86,14 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
     if (availableLetters.contains(pressedKey)) {
       typeLetter(pressedKey);
     }
+    if (event->key() == Qt::Key_Space) {
+      typeLetter(" ");
+    }
   }
   if ((event->key() == Qt::Key_Enter) || (event->text() == "\r")) {
     typeLetter("\n");
   }
+
 }
 
 QString Canvas::changeFont(IOController &ioController, QString fontPath) {
