@@ -2,9 +2,7 @@
 #include <QFileDialog>
 #include <QKeyEvent>
 #include <QPainter>
-
 #include <cmath>
-
 #include "canvas.h"
 #include "canvas_actions.h"
 
@@ -13,13 +11,15 @@ Canvas::Canvas(QWidget *parent) : QWidget(parent) {
 }
 
 void Canvas::drawLetters(QPainter &painter) {
-  // int w = width(), h = height();
   int w = fontSizeInPixels, h = fontSizeInPixels;
-  int hor = 0, vert = 0;
+  cursorHorPos = 0, cursorVertPos = 0;
   for (int t = 0; t < text.size(); ++t) {
-    if (!map.contains(text.at(t))) {
-      ++vert;
-      hor = 0;
+    if (text.at(t) == '\n') {
+      ++cursorVertPos;
+      cursorHorPos = 0;
+      continue;
+    }
+    if (text.at(t) == '\r') {
       continue;
     }
     SplineGroup d = map.value(text.at(t));
@@ -32,10 +32,12 @@ void Canvas::drawLetters(QPainter &painter) {
       Spline spline = activeGroup->get(k);
       QPointF a = spline.atVal(0);
       paths.append(QPainterPath());
-      paths[k].moveTo(hor * w + a.x() * w, vert * h + a.y() * h);
+      paths[k].moveTo(cursorHorPos * w + a.x() * w,
+                      cursorVertPos * h + a.y() * h);
       for (size_t i = 1; spline.valSize() > 0 && i < spline.valSize(); ++i) {
         QPointF b = spline.atVal(i);
-        paths[k].lineTo(hor * w + b.x() * w, vert * h + b.y() * h);
+        paths[k].lineTo(cursorHorPos * w + b.x() * w,
+                        cursorVertPos * h + b.y() * h);
       }
     }
     for (int i = 0; i < paths.size() - 1; ++i) {
@@ -51,7 +53,7 @@ void Canvas::drawLetters(QPainter &painter) {
     for (size_t i = 0; i < activeGroup->size(); ++i) {
       painter.fillPath(paths[i], QBrush(Qt::black, Qt::SolidPattern));
     }
-    ++hor;
+    ++cursorHorPos;
   }
   painter.drawLine(QPointF(cursorHorPos * w, cursorVertPos * h),
                    QPointF(cursorHorPos * w, (cursorVertPos + 1) * h));
@@ -73,13 +75,10 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
     }
     auto availableLetters = map.keys();
     if (availableLetters.contains(pressedKey)) {
-      ++cursorHorPos;
       typeLetter(pressedKey);
     }
   }
   if ((event->key() == Qt::Key_Enter) || (event->text() == "\r")) {
-    ++cursorVertPos;
-    cursorHorPos = 0;
     typeLetter("\n");
   }
 }
@@ -95,6 +94,26 @@ QString Canvas::changeFont(IOController &ioController, QString fontPath) {
   }
   QFileInfo fileInfo(fontPath);
   return fileInfo.completeBaseName();
+}
+
+void Canvas::loadFile(IOController &ioController) {
+  projectFileName = QFileDialog::getOpenFileName(this, tr("Open file"), "");
+  if (!projectFileName.isEmpty()) {
+    text = ioController.readTextFromFile(projectFileName);
+    repaint();
+  }
+}
+
+void Canvas::saveFile(IOController &ioController) {
+  if (projectFileName.isEmpty()) {
+    projectFileName = QFileDialog::getSaveFileName(this, tr("Save File"), "");
+  }
+  ioController.writeTextToFile(projectFileName, text);
+}
+
+void Canvas::saveFileAs(IOController &ioController) {
+  projectFileName = QFileDialog::getSaveFileName(this, tr("Save File"), "");
+  ioController.writeTextToFile(projectFileName, text);
 }
 
 void Canvas::typeLetter(QString letter) {

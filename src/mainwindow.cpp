@@ -18,8 +18,14 @@ void MainWindow::initMenuBar() {
   QMenuBar *menuBar = this->menuBar();
 
   QMenu *menuFile = new QMenu("File", this);
-  menuFile->addAction("Create Project", this, SLOT(openFont()),
+  menuFile->addAction("Open Font", this, SLOT(openFont()),
                       QKeySequence(Qt::SHIFT + Qt::CTRL + Qt::Key_O));
+  menuFile->addAction("Open File", this, SLOT(loadFile()),
+                      QKeySequence(Qt::SHIFT + Qt::CTRL + Qt::Key_L));
+  menuFile->addAction("Save File", this, SLOT(saveFile()),
+                      QKeySequence(Qt::CTRL + Qt::Key_S));
+  menuFile->addAction("Save As", this, SLOT(saveFileAs()),
+                      QKeySequence(Qt::CTRL + Qt::Key_S));
 
   QMenu *menuEdit = new QMenu("Edit", this);
   menuEdit->addAction("Redo", this, SLOT(undoCmd()),
@@ -43,6 +49,12 @@ void MainWindow::openFont(QString fontPath) {
     ui->statusBar->showMessage("Current Font: " + newFont);
   }
 }
+
+void MainWindow::loadFile() { canvas->loadFile(ioController); }
+
+void MainWindow::saveFile() { canvas->saveFile(ioController); }
+
+void MainWindow::saveFileAs() { canvas->saveFileAs(ioController); }
 
 void MainWindow::redoCmd() { canvas->redoCmd(); }
 

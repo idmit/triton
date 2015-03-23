@@ -19,3 +19,23 @@ QHash<QString, SplineGroup> IOController::readFromFile(QString fileName) {
   file.close();
   return map;
 }
+
+void IOController::writeTextToFile(QString &fileName, const QString text)
+{
+  QFile file(fileName);
+  file.open(QIODevice::WriteOnly | QIODevice::Text);
+  textStream.setDevice(&file);
+  textStream << text;
+  file.close();
+}
+
+QString IOController::readTextFromFile(QString &fileName)
+{
+  QString text;
+  QFile file(fileName);
+  file.open(QIODevice::ReadOnly | QIODevice::Text);
+  textStream.setDevice(&file);
+  text = textStream.readAll();
+  file.close();
+  return text;
+}

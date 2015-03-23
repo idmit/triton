@@ -18,6 +18,7 @@ protected:
 private:
   QHash<QString, SplineGroup> map;
   QString text;
+  QString projectFileName;
   QUndoStack undoStack;
   unsigned  cursorHorPos = 0, cursorVertPos = 0;
   unsigned fontSizeInPixels = 30;
@@ -26,6 +27,9 @@ private:
 
 public slots:
   QString changeFont(IOController &ioController, QString fontPath);
+  void loadFile(IOController &ioController);
+  void saveFile(IOController &ioController);
+  void saveFileAs(IOController &ioController);
   void typeLetter(QString letter);
   void removeLetter();
   void redoCmd();

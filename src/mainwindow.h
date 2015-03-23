@@ -30,7 +30,10 @@ private:
 
 public slots:
   void openFont(QString fontPath = "");
-  void redoCmd() ;
+  void loadFile();
+  void saveFile();
+  void saveFileAs();
+  void redoCmd();
   void undoCmd();
 };
 
