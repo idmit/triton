@@ -12,30 +12,19 @@ Canvas::Canvas(QWidget *parent) : QWidget(parent) {
   setFocusPolicy(Qt::StrongFocus);
 }
 
-void Canvas::drawGrid(QPainter &painter, size_t cellNum, size_t cellsInThick) {
-  int w = width(), h = height();
-  int grayTone = 240, lineWidth = 0;
-  QColor color(grayTone, grayTone, grayTone);
-
-  painter.fillRect(QRectF(0, 0, w, h), QBrush(QColor("white")));
-  //  for (size_t i = 0; i < cellNum; ++i) {
-  //    if ((i + 1) % cellsInThick == 0) {
-  //      lineWidth = 1;
-  //    } else {
-  //      lineWidth = 2;
-  //    }
-  //    painter.setPen(QPen(color, lineWidth, Qt::SolidLine));
-  //    painter.drawLine(0, i * h / cellNum, w, i * h / cellNum);
-  //    painter.drawLine(i * w / cellNum, 0, i * w / cellNum, h);
-  //  }
-}
-
 void Canvas::drawLetters(QPainter &painter) {
-  int w = width(), h = height();
-
-  for (size_t t = 0; t < text.size(); ++t) {
+  // int w = width(), h = height();
+  int w = fontSizeInPixels, h = fontSizeInPixels;
+  int hor = 0, vert = 0;
+  for (int t = 0; t < text.size(); ++t) {
+    if (!map.contains(text.at(t))) {
+      ++vert;
+      hor = 0;
+      continue;
+    }
     SplineGroup d = map.value(text.at(t));
     SplineGroup *activeGroup = &d;
+    activeGroup->rebuildAll();
 
     QVector<QPainterPath> paths;
 
@@ -43,13 +32,12 @@ void Canvas::drawLetters(QPainter &painter) {
       Spline spline = activeGroup->get(k);
       QPointF a = spline.atVal(0);
       paths.append(QPainterPath());
-      paths[k].moveTo(a.x() * w, a.y() * h);
+      paths[k].moveTo(hor * w + a.x() * w, vert * h + a.y() * h);
       for (size_t i = 1; spline.valSize() > 0 && i < spline.valSize(); ++i) {
         QPointF b = spline.atVal(i);
-        paths[k].lineTo(b.x() * w, b.y() * h);
+        paths[k].lineTo(hor * w + b.x() * w, vert * h + b.y() * h);
       }
     }
-
     for (int i = 0; i < paths.size() - 1; ++i) {
       for (int k = i + 1; k < paths.size(); ++k) {
         if (paths[i].intersects(paths[k])) {
@@ -61,37 +49,16 @@ void Canvas::drawLetters(QPainter &painter) {
     }
 
     for (size_t i = 0; i < activeGroup->size(); ++i) {
-      Spline spline = activeGroup->get(i);
-
-      painter.fillPath(paths[i], QBrush(Qt::black, Qt::Dense5Pattern));
-
-      painter.setPen(QPen(Qt::gray, 1, Qt::DashLine));
-      if (spline.supSize() > 0) {
-        for (size_t i = 0; i < spline.supSize() - 1; ++i) {
-          QPointF a = spline.atSup(i), b = spline.atSup(i + 1);
-          painter.drawLine(a.x() * w, a.y() * h, b.x() * w, b.y() * h);
-        }
-        QPointF a = spline.atSup(spline.supSize() - 1), b = spline.atSup(0);
-        painter.drawLine(a.x() * w, a.y() * h, b.x() * w, b.y() * h);
-
-        painter.setPen(QPen(QColor(0, 116, 217), 1, Qt::SolidLine));
-        QColor brushColor = (i == activeGroup->getIdx())
-                                ? QColor(255, 220, 0)
-                                : QColor(221, 221, 221);
-        painter.setBrush(QBrush(brushColor, Qt::SolidPattern));
-
-        for (size_t i = 0; i < spline.supSize(); ++i) {
-          QPointF a = spline.atSup(i);
-          painter.drawEllipse(QPointF(a.x() * w, a.y() * h), 5, 5);
-        }
-      }
+      painter.fillPath(paths[i], QBrush(Qt::black, Qt::SolidPattern));
     }
+    ++hor;
   }
+  painter.drawLine(QPointF(cursorHorPos * w, cursorVertPos * h),
+                   QPointF(cursorHorPos * w, (cursorVertPos + 1) * h));
 }
 
 void Canvas::paintEvent(QPaintEvent *) {
   QPainter painter(this);
-  drawGrid(painter);
   drawLetters(painter);
 }
 
@@ -106,8 +73,14 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
     }
     auto availableLetters = map.keys();
     if (availableLetters.contains(pressedKey)) {
+      ++cursorHorPos;
       typeLetter(pressedKey);
     }
+  }
+  if ((event->key() == Qt::Key_Enter) || (event->text() == "\r")) {
+    ++cursorVertPos;
+    cursorHorPos = 0;
+    typeLetter("\n");
   }
 }
 
@@ -129,7 +102,9 @@ void Canvas::typeLetter(QString letter) {
   repaint();
 }
 void Canvas::removeLetter() {
-  undoStack.push(new RemoveLetterCmd(text));
+  if (!text.isEmpty()) {
+    undoStack.push(new RemoveLetterCmd(text));
+  }
   repaint();
 }
 

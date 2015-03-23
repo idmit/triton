@@ -19,10 +19,10 @@ private:
   QHash<QString, SplineGroup> map;
   QString text;
   QUndoStack undoStack;
-
-  void drawGrid(QPainter &painter, size_t cellNum = 20,
-                size_t cellsInThick = 2);
+  unsigned  cursorHorPos = 0, cursorVertPos = 0;
+  unsigned fontSizeInPixels = 30;
   void drawLetters(QPainter &painter);
+
 
 public slots:
   QString changeFont(IOController &ioController, QString fontPath);

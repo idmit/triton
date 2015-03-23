@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
 
   canvas = new Canvas(this);
   canvas->resize(maximumSize());
-  openFont("/Users/ivandmi/Downloads/font.trft");
+  openFont("font.trft");
   ui->gridLayout->addWidget(canvas);
 }
 
