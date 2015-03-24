@@ -20,10 +20,10 @@ private:
   QString text;
   QString projectFileName;
   QUndoStack undoStack;
-  unsigned  cursorHorPos = 0, cursorVertPos = 0;
-  unsigned fontSizeInPixels = 30;
+  unsigned cursorHorPos = 0, cursorVertPos = 0;
+  int fontSizeInPixels = 30;
   void drawLetters(QPainter &painter);
-
+  const int minFontSizeInPixels = 15;
 
 public slots:
   QString changeFont(IOController &ioController, QString fontPath);
@@ -34,6 +34,8 @@ public slots:
   void removeLetter();
   void redoCmd();
   void undoCmd();
+  void increaseFontSize();
+  void decreaseFontSize();
 };
 
 #endif // CANVAS_H

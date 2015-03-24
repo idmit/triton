@@ -32,6 +32,10 @@ void MainWindow::initMenuBar() {
                       QKeySequence(Qt::CTRL + Qt::Key_Z));
   menuEdit->addAction("Undo", this, SLOT(redoCmd()),
                       QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Z));
+  menuEdit->addAction("Increase font size", this, SLOT(incFont()),
+                      QKeySequence(Qt::CTRL + Qt::Key_Equal));
+  menuEdit->addAction("Decrease font size", this, SLOT(decFont()),
+                      QKeySequence(Qt::CTRL + Qt::Key_Minus));
 
   QMenu *menuAbout = new QMenu("Help", this);
   menuAbout->addAction("About");
@@ -59,5 +63,9 @@ void MainWindow::saveFileAs() { canvas->saveFileAs(ioController); }
 void MainWindow::redoCmd() { canvas->redoCmd(); }
 
 void MainWindow::undoCmd() { canvas->undoCmd(); }
+
+void MainWindow::incFont() { canvas->increaseFontSize(); }
+
+void MainWindow::decFont() { canvas->decreaseFontSize(); }
 
 MainWindow::~MainWindow() { delete ui; }

@@ -93,7 +93,6 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
   if ((event->key() == Qt::Key_Enter) || (event->text() == "\r")) {
     typeLetter("\n");
   }
-
 }
 
 QString Canvas::changeFont(IOController &ioController, QString fontPath) {
@@ -103,9 +102,7 @@ QString Canvas::changeFont(IOController &ioController, QString fontPath) {
   }
   if (!fontPath.isEmpty()) {
     map = ioController.readFromFile(fontPath);
-    foreach (QString key, map.keys()) {
-      map.find(key)->rebuildAll();
-    }
+    foreach (QString key, map.keys()) { map.find(key)->rebuildAll(); }
     repaint();
   }
   QFileInfo fileInfo(fontPath);
@@ -150,5 +147,15 @@ void Canvas::redoCmd() {
 
 void Canvas::undoCmd() {
   undoStack.undo();
+  repaint();
+}
+
+void Canvas::increaseFontSize() {
+  fontSizeInPixels += (fontSizeInPixels >= height() - minFontSizeInPixels) ? 0 : 5;
+  repaint();
+}
+
+void Canvas::decreaseFontSize() {
+  fontSizeInPixels -= (fontSizeInPixels <= minFontSizeInPixels) ? 0 : 5;
   repaint();
 }
