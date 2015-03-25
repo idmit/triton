@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
 
   canvas = new Canvas(this);
   canvas->resize(maximumSize());
-  openFont("font.trft");
+  openFont("default.trft");
   ui->gridLayout->addWidget(canvas);
 }
 
