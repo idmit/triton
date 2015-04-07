@@ -11,7 +11,7 @@ Canvas::Canvas(QWidget *parent) : QWidget(parent) {
 }
 
 void Canvas::drawLetters(QPainter &painter) {
-  int w = fontSizeInPixels, h = fontSizeInPixels;
+  int h = fontSizeInPixels;
   cursorHorPos = 0, cursorVertPos = 0;
 
   painter.fillRect(QRectF(0, 0, width(), height()), QBrush(QColor("white")));
@@ -36,17 +36,28 @@ void Canvas::drawLetters(QPainter &painter) {
     SplineGroup *activeGroup = &d;
 
     QVector<QPainterPath> paths;
+    int w = (int)(h / activeGroup->getHWR());
+    int s = (int)(h / activeGroup->getHSR());
+    double lBorder = activeGroup->getBorder("left");
+    double bBorder = activeGroup->getBorder("bottom");
+    double tBorder = activeGroup->getBorder("top");
+    double rBorder = lBorder + (bBorder - tBorder) / activeGroup->getHWR();
+    double sBorder = rBorder + (bBorder - tBorder) / activeGroup->getHSR();
 
     for (size_t k = 0; k < activeGroup->size(); ++k) {
       Spline spline = activeGroup->get(k);
       QPointF a = spline.atVal(0);
       paths.append(QPainterPath());
-      paths[k].moveTo(cursorHorPos * w + a.x() * w,
-                      cursorVertPos * h + a.y() * h);
+      double x = (a.x() - lBorder) / (rBorder - lBorder);
+      double y = (a.y() - tBorder) / (bBorder - tBorder);
+      paths[k].moveTo(cursorHorPos * (w + s) + x * w,
+                      cursorVertPos * h + y * h);
       for (size_t i = 1; spline.valSize() > 0 && i < spline.valSize(); ++i) {
         QPointF b = spline.atVal(i);
-        paths[k].lineTo(cursorHorPos * w + b.x() * w,
-                        cursorVertPos * h + b.y() * h);
+        double x = (b.x() - lBorder) / (rBorder - lBorder);
+        double y = (b.y() - tBorder) / (bBorder - tBorder);
+        paths[k].lineTo(cursorHorPos * (w + s) + x * w,
+                        cursorVertPos * h + y * h);
       }
     }
     for (int i = 0; i < paths.size() - 1; ++i) {
@@ -64,8 +75,18 @@ void Canvas::drawLetters(QPainter &painter) {
     }
     ++cursorHorPos;
   }
-  painter.drawLine(QPointF(cursorHorPos * w, cursorVertPos * h),
-                   QPointF(cursorHorPos * w, (cursorVertPos + 1) * h));
+  if (text.size() > 0) {
+    int t = text.size() - 1;
+    SplineGroup d = map.value(text.at(t));
+    SplineGroup *activeGroup = &d;
+    int w = (int)(h / activeGroup->getHWR());
+    int s = (int)(h / activeGroup->getHSR());
+    painter.drawLine(QPointF(cursorHorPos * (w + s), cursorVertPos * h),
+                     QPointF(cursorHorPos * (w + s), (cursorVertPos + 1) * h));
+  } else {
+    painter.drawLine(QPointF(0, cursorVertPos * h),
+                     QPointF(0, (cursorVertPos + 1) * h));
+  }
 }
 
 void Canvas::paintEvent(QPaintEvent *) {
@@ -151,7 +172,8 @@ void Canvas::undoCmd() {
 }
 
 void Canvas::increaseFontSize() {
-  fontSizeInPixels += (fontSizeInPixels >= height() - minFontSizeInPixels) ? 0 : 5;
+  fontSizeInPixels +=
+      (fontSizeInPixels >= height() - minFontSizeInPixels) ? 0 : 5;
   repaint();
 }
 

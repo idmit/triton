@@ -11,8 +11,8 @@ MainWindow::MainWindow(QWidget *parent)
 
   canvas = new Canvas(this);
   canvas->resize(maximumSize());
-  static_assert(false, "Specify path to default font.");
-  openFont("triton/demo.trft");
+  //static_assert(false, "Specify path to default font.");
+  openFont("demo.trft");
   ui->gridLayout->addWidget(canvas);
 }
 
