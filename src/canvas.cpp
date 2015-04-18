@@ -42,7 +42,6 @@ void Canvas::drawLetters(QPainter &painter) {
     double bBorder = activeGroup->getBorder("bottom");
     double tBorder = activeGroup->getBorder("top");
     double rBorder = lBorder + (bBorder - tBorder) / activeGroup->getHWR();
-    double sBorder = rBorder + (bBorder - tBorder) / activeGroup->getHSR();
 
     for (size_t k = 0; k < activeGroup->size(); ++k) {
       Spline spline = activeGroup->get(k);
@@ -148,6 +147,13 @@ void Canvas::saveFile(IOController &ioController) {
 void Canvas::saveFileAs(IOController &ioController) {
   projectFileName = QFileDialog::getSaveFileName(this, tr("Save File"), "");
   ioController.writeTextToFile(projectFileName, text);
+}
+
+void Canvas::closeFile() {
+  projectFileName.clear();
+  text.clear();
+  cursorHorPos = 0;
+  cursorVertPos = 0;
 }
 
 void Canvas::typeLetter(QString letter) {

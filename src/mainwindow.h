@@ -33,10 +33,12 @@ public slots:
   void loadFile();
   void saveFile();
   void saveFileAs();
+  void closeFile();
   void redoCmd();
   void undoCmd();
   void incFont();
   void decFont();
+  void about();
 };
 
 #endif // MAINWINDOW_H

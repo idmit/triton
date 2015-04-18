@@ -30,6 +30,7 @@ public slots:
   void loadFile(IOController &ioController);
   void saveFile(IOController &ioController);
   void saveFileAs(IOController &ioController);
+  void closeFile();
   void typeLetter(QString letter);
   void removeLetter();
   void redoCmd();

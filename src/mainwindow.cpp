@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <type_traits>
-
+#include <QMessageBox>
 #include <QMenuBar>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -27,7 +27,9 @@ void MainWindow::initMenuBar() {
   menuFile->addAction("Save File", this, SLOT(saveFile()),
                       QKeySequence(Qt::CTRL + Qt::Key_S));
   menuFile->addAction("Save As", this, SLOT(saveFileAs()),
-                      QKeySequence(Qt::CTRL + Qt::Key_S));
+                      QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_S));
+  menuFile->addAction("Close File", this, SLOT(closeFile()),
+                      QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Q));
 
   QMenu *menuEdit = new QMenu("Edit", this);
   menuEdit->addAction("Redo", this, SLOT(undoCmd()),
@@ -62,6 +64,8 @@ void MainWindow::saveFile() { canvas->saveFile(ioController); }
 
 void MainWindow::saveFileAs() { canvas->saveFileAs(ioController); }
 
+void MainWindow::closeFile() {canvas->closeFile();}
+
 void MainWindow::redoCmd() { canvas->redoCmd(); }
 
 void MainWindow::undoCmd() { canvas->undoCmd(); }
@@ -69,5 +73,17 @@ void MainWindow::undoCmd() { canvas->undoCmd(); }
 void MainWindow::incFont() { canvas->increaseFontSize(); }
 
 void MainWindow::decFont() { canvas->decreaseFontSize(); }
+
+void MainWindow::about() {
+    QMessageBox msgBox;
+    msgBox.setTextFormat(Qt::RichText);
+    msgBox.setText("Triton is a simple text editor implemented during our "
+                   "studies in SPbPU.<br/>Authors: Ivan Dmitrievsky and Semyon "
+                   "Kozyrev<br/>Github repository:<a "
+                   "href='https://github.com/ivandmitrievsky/triton'>Triton</"
+                   "a><br/>Take a look at our font editor that creates fonts for this editor:<a "
+                   "href='https://github.com/ivandmitrievsky/trident'>Trident</a>");
+    msgBox.exec();
+  }
 
 MainWindow::~MainWindow() { delete ui; }
