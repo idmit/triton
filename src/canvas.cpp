@@ -154,6 +154,7 @@ void Canvas::closeFile() {
   text.clear();
   cursorHorPos = 0;
   cursorVertPos = 0;
+  repaint();
 }
 
 void Canvas::typeLetter(QString letter) {
