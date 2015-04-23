@@ -90,6 +90,7 @@ void Canvas::drawLetters(QPainter &painter) {
 
 void Canvas::paintEvent(QPaintEvent *) {
   QPainter painter(this);
+  painter.setRenderHint(QPainter::Antialiasing);
   drawLetters(painter);
 }
 
@@ -154,6 +155,7 @@ void Canvas::closeFile() {
   text.clear();
   cursorHorPos = 0;
   cursorVertPos = 0;
+  repaint();
 }
 
 void Canvas::typeLetter(QString letter) {
